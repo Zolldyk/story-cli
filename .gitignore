@@ -1,0 +1,11 @@
+# Ignore all current directories
+.bmad-core/
+.claude/
+.ignore/
+docs/
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/

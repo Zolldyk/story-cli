@@ -4,7 +4,30 @@ import { Command } from 'commander';
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import chalk from 'chalk';
+import { createConfigCommand } from './commands/config.js';
+import { createRegisterCommand } from './commands/register.js';
+import { registerStatusCommand } from './commands/status.js';
+import { TerminalUI } from './lib/terminal-ui.js';
+import { handleError } from './lib/error-handler.js';
+import { EXIT_CODE_USER_ERROR } from './types/errors.js';
+import { suggestCommand, formatSuggestion } from './lib/suggestion-engine.js';
+
+/**
+ * Global error handlers
+ * Catch unhandled exceptions and promise rejections
+ * Source: architecture/error-handling-strategy.md#General Approach
+ */
+process.on('uncaughtException', (error: Error) => {
+  const debug = TerminalUI.isDebugMode();
+  handleError(error, debug);
+});
+
+process.on('unhandledRejection', (reason: unknown) => {
+  const error =
+    reason instanceof Error ? reason : new Error(String(reason));
+  const debug = TerminalUI.isDebugMode();
+  handleError(error, debug);
+});
 
 // Validate Node.js version
 function validateNodeVersion(): void {
@@ -13,12 +36,10 @@ function validateNodeVersion(): void {
   const majorVersion = parseInt(currentVersion.slice(1).split('.')[0], 10);
 
   if (majorVersion < requiredMajorVersion) {
-    console.error(
-      chalk.red(
-        `Story CLI requires Node.js ${requiredMajorVersion} or higher. Current version: ${currentVersion}. Please upgrade Node.js.`
-      )
+    TerminalUI.error(
+      `Story CLI requires Node.js ${requiredMajorVersion} or higher. Current version: ${currentVersion}. Please upgrade Node.js.`
     );
-    process.exit(1);
+    process.exit(EXIT_CODE_USER_ERROR);
   }
 }
 
@@ -39,40 +60,49 @@ program
   .description(
     'CLI tool for Story Protocol - Register and manage IP assets on the blockchain'
   )
-  .version(packageJson.version, '-v, --version', 'Display current version');
+  .version(packageJson.version, '-v, --version', 'Display current version')
+  .option('--debug', 'Enable debug mode with verbose output and stack traces')
+  .hook('preAction', (thisCommand) => {
+    // Enable debug mode if --debug flag is present or DEBUG env var is set
+    const debugFlag = thisCommand.opts().debug || process.env.DEBUG === 'true';
+    TerminalUI.setDebugMode(debugFlag);
 
-// Register command placeholder
-program
-  .command('register')
-  .description('Register a new IP asset on Story Protocol')
-  .action(() => {
-    console.log('Register command - To be implemented in future stories');
+    if (debugFlag) {
+      TerminalUI.debug('Debug mode enabled');
+    }
   });
+
+// Register command
+program.addCommand(createRegisterCommand());
 
 // Portfolio command placeholder
 program
   .command('portfolio')
   .description('Generate and view your IP asset portfolio')
   .action(() => {
-    console.log('Portfolio command - To be implemented in future stories');
+    TerminalUI.info('Portfolio command - To be implemented in future stories');
   });
 
-// Config command placeholder
-program
-  .command('config')
-  .description('Configure Story CLI settings')
-  .action(() => {
-    console.log('Config command - To be implemented in future stories');
-  });
+// Status command
+registerStatusCommand(program);
+
+// Config command
+program.addCommand(createConfigCommand());
 
 // Handle unknown commands
-program.on('command:*', () => {
-  console.error(
-    chalk.red(
-      'Command not found. Run `story --help` to see available commands.'
-    )
-  );
-  process.exit(1);
+program.on('command:*', (operands) => {
+  const unknownCommand = operands[0];
+  const validCommands = ['register', 'portfolio', 'status', 'config'];
+  const suggestion = suggestCommand(unknownCommand, validCommands);
+
+  if (suggestion) {
+    TerminalUI.error(formatSuggestion(unknownCommand, suggestion, 'command'));
+  } else {
+    TerminalUI.error(
+      `Unknown command: '${unknownCommand}'\nRun \`story --help\` to see available commands.`
+    );
+  }
+  process.exit(EXIT_CODE_USER_ERROR);
 });
 
 program.parse(process.argv);

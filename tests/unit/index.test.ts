@@ -42,7 +42,8 @@ describe('CLI Entry Point', () => {
 
       // Assert
       expect(result).toContain('register');
-      expect(result).toContain('Register a new IP asset on Story Protocol');
+      expect(result).toContain('Register an IP asset with interactive license wizard');
+      expect(result).toContain('file-path');
     });
   });
 
@@ -76,8 +77,8 @@ describe('CLI Entry Point', () => {
         const stderr = execError.stderr?.toString() || '';
 
         // Assert: Error message displayed
-        expect(stderr).toContain('Command not found');
-        expect(stderr).toContain('story --help');
+        expect(stderr).toContain('Unknown command');
+        expect(stderr).toContain('unknown-command');
 
         // Assert: Exit code 1 for user error
         expect(execError.status).toBe(1);
@@ -86,12 +87,23 @@ describe('CLI Entry Point', () => {
   });
 
   describe('Command routing', () => {
-    it('should route to register command', () => {
-      // Arrange & Act
-      const result = execSync(`${CLI_PATH} register`, { encoding: 'utf-8' });
+    it('should require file-path argument for register command', () => {
+      // Arrange & Act & Assert
+      try {
+        execSync(`${CLI_PATH} register`, { encoding: 'utf-8' });
+        // Should not reach here
+        expect(true).toBe(false);
+      } catch (error: unknown) {
+        const execError = error as { stderr?: Buffer; status?: number };
+        const stderr = execError.stderr?.toString() || '';
 
-      // Assert
-      expect(result).toContain('Register command - To be implemented');
+        // Assert: Error message displayed for missing file-path
+        expect(stderr).toContain('missing required argument');
+        expect(stderr).toContain('file-path');
+
+        // Assert: Exit code 1 for user error
+        expect(execError.status).toBe(1);
+      }
     });
 
     it('should route to portfolio command', () => {

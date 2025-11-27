@@ -96,7 +96,7 @@ export class TerminalUI {
    * @param message - Warning message to display
    */
   static warning(message: string): void {
-    console.log(chalk.yellow(`⚠ ${message}`));
+    console.log(chalk.yellow(`⚠️ ${message}`));
   }
 
   /**
@@ -148,6 +148,95 @@ export class TerminalUI {
    * @param message - Info message to display
    */
   static info(message: string): void {
-    console.log(chalk.blue(`ℹ ${message}`));
+    console.log(chalk.blue(`ℹ️ ${message}`));
+  }
+
+  /**
+   * Generate network badge with appropriate color
+   * Source: Story 2.5 AC 9
+   *
+   * @param network - Network name ('testnet' or 'mainnet')
+   * @returns Colored badge string "[Testnet]" or "[Mainnet]"
+   */
+  static networkBadge(network: string): string {
+    const isMainnet = network.toLowerCase() === 'mainnet';
+    const label = isMainnet ? 'Mainnet' : 'Testnet';
+    return isMainnet
+      ? chalk.magenta(`[${label}]`)
+      : chalk.cyan(`[${label}]`);
+  }
+
+  /**
+   * Display major success message with celebration emoji and Boxen
+   * Source: Story 2.5 AC 5, 6
+   *
+   * @param title - Box title
+   * @param content - Box content
+   */
+  static majorSuccess(title: string, content: string): void {
+    const boxContent = `${chalk.bold(`🎉 ${title}`)}\n\n${content}`;
+    console.log(
+      boxen(boxContent, {
+        padding: 1,
+        margin: 1,
+        borderStyle: 'double',
+        borderColor: 'green',
+      })
+    );
+  }
+
+  /**
+   * Create a processing spinner with gear emoji
+   * Source: Story 2.5 AC 6
+   *
+   * @param message - Message to display with the spinner
+   * @returns Ora spinner instance
+   */
+  static processing(message: string): Ora {
+    return ora({
+      text: `⚙️ ${message}`,
+      color: 'cyan',
+    });
+  }
+
+  /**
+   * Create a querying spinner with magnifying glass emoji
+   * Source: Story 2.5 AC 6
+   *
+   * @param message - Message to display with the spinner
+   * @returns Ora spinner instance
+   */
+  static querying(message: string): Ora {
+    return ora({
+      text: `🔍 ${message}`,
+      color: 'cyan',
+    });
+  }
+
+  /**
+   * Calculate and format execution time
+   * Source: Story 2.5 AC 8
+   *
+   * @param startTime - Start time from performance.now()
+   * @returns Formatted string "Completed in X.X seconds"
+   */
+  static executionTime(startTime: number): string {
+    const elapsed = (performance.now() - startTime) / 1000;
+    return chalk.gray(`Completed in ${elapsed.toFixed(1)} seconds`);
+  }
+
+  /**
+   * Truncate hash/ID to display format
+   * Source: Story 2.5 AC 7
+   *
+   * @param hash - Full hash or ID string
+   * @param showFull - If true, return full hash without truncation
+   * @returns Truncated hash (0x1234...5678) or full hash
+   */
+  static truncateHash(hash: string, showFull: boolean = false): string {
+    if (showFull || hash.length <= 14) {
+      return hash;
+    }
+    return `${hash.slice(0, 6)}...${hash.slice(-4)}`;
   }
 }

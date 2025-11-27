@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    environment:
+      - STORY_CLI_MOCK=true
+      - NODE_ENV=test
+    command: npm run test

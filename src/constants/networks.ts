@@ -8,6 +8,9 @@ export const NETWORKS = {
     explorerUrl: 'https://aeneid.explorer.story.foundation',
     faucetUrl: 'https://faucet.story.foundation',
     spgNftContract: '0xc32A8a0FF3beDDDa58393d022aF433e78739FAbc' as const, // Public SPG NFT contract for testing
+    // Story Protocol Official API (staging/testnet)
+    storyApiUrl: 'https://staging-api.storyprotocol.net/api/v4',
+    storyApiKey: 'KOTbaGUSWQ6cUJWhiJYiOjPgB0kTRu1eCFFvQL0IWls',
   },
   mainnet: {
     name: 'mainnet',
@@ -18,6 +21,9 @@ export const NETWORKS = {
     explorerUrl: 'https://explorer.story.foundation',
     faucetUrl: null,
     spgNftContract: undefined, // Users should deploy their own SPG NFT contract on mainnet
+    // Story Protocol Official API (production)
+    storyApiUrl: 'https://api.storyapis.com/api/v4',
+    storyApiKey: 'MhBsxkU1z9fG6TofE59KqiiWV-YlYE8Q4awlLQehF3U',
   },
 } as const;
 

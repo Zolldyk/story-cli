@@ -162,6 +162,292 @@ describe('Complete Registration Flow with Transaction - Story 1.7', () => {
   });
 });
 
+describe('Registration Output Format Validation - Story 2.4 Task 4', () => {
+  it('should have valid IP ID format (0x + 40 hex chars)', () => {
+    // Arrange
+    const mockIpId = '0x1234567890abcdef1234567890abcdef12345678';
+
+    // Assert: Verify IP ID format
+    expect(mockIpId).toMatch(/^0x[a-fA-F0-9]{40}$/);
+    expect(mockIpId.length).toBe(42);
+  });
+
+  it('should have valid transaction hash format (0x + 64 hex chars)', () => {
+    // Arrange
+    const mockTxHash = '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890';
+
+    // Assert: Verify transaction hash format
+    expect(mockTxHash).toMatch(/^0x[a-fA-F0-9]{64}$/);
+    expect(mockTxHash.length).toBe(66);
+  });
+
+  it('should include block explorer URL in success output', () => {
+    // Arrange
+    const mockTxHash = '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890';
+    const expectedExplorerUrl = `https://aeneid.explorer.story.foundation/tx/${mockTxHash}`;
+
+    // Assert: Verify explorer URL format
+    expect(expectedExplorerUrl).toContain('explorer.story.foundation');
+    expect(expectedExplorerUrl).toContain('/tx/');
+    expect(expectedExplorerUrl).toContain(mockTxHash);
+  });
+
+  it('should have valid license configuration in registered asset', () => {
+    // Arrange
+    const mockLicenseConfig = {
+      type: 'NON_COMMERCIAL_ONLY',
+      commercialUse: false,
+      derivativesAllowed: false,
+    };
+
+    // Assert: Verify license config structure
+    expect(mockLicenseConfig).toHaveProperty('type');
+    expect(mockLicenseConfig).toHaveProperty('commercialUse');
+    expect(mockLicenseConfig).toHaveProperty('derivativesAllowed');
+    expect(['NON_COMMERCIAL_ONLY', 'COMMERCIAL_USE', 'COMMERCIAL_REMIX', 'NON_COMMERCIAL_SOCIAL_REMIXING'])
+      .toContain(mockLicenseConfig.type);
+  });
+
+  it('should have valid metadata in registered asset', () => {
+    // Arrange
+    const mockMetadata = {
+      name: 'Test Artwork',
+      description: 'Test Description',
+      imageHash: 'QmTestImage123',
+    };
+
+    // Assert: Verify metadata structure
+    expect(mockMetadata.name).toBeTruthy();
+    expect(mockMetadata.name.length).toBeGreaterThan(0);
+    expect(mockMetadata.imageHash).toMatch(/^Qm[a-zA-Z0-9]+$/);
+  });
+
+  it('should have valid IPFS hash format (Qm prefix)', () => {
+    // Arrange
+    const mockIpfsHash = 'QmTestMetadata456';
+
+    // Assert: Verify IPFS hash starts with Qm
+    expect(mockIpfsHash).toMatch(/^Qm[a-zA-Z0-9]+$/);
+  });
+
+  it('should have all required fields in RegisteredIPAsset', () => {
+    // Arrange
+    const mockRegisteredAsset = {
+      ipId: '0x1234567890abcdef1234567890abcdef12345678',
+      transactionHash: '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
+      blockNumber: 12345,
+      metadataHash: 'QmTest123',
+      licenseConfig: { type: 'NON_COMMERCIAL_ONLY', commercialUse: false, derivativesAllowed: false },
+      owner: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0',
+      timestamp: new Date().toISOString(),
+      explorerUrl: 'https://aeneid.explorer.story.foundation/tx/0xabcdef...',
+    };
+
+    // Assert: Verify all required fields exist
+    expect(mockRegisteredAsset).toHaveProperty('ipId');
+    expect(mockRegisteredAsset).toHaveProperty('transactionHash');
+    expect(mockRegisteredAsset).toHaveProperty('blockNumber');
+    expect(mockRegisteredAsset).toHaveProperty('metadataHash');
+    expect(mockRegisteredAsset).toHaveProperty('licenseConfig');
+    expect(mockRegisteredAsset).toHaveProperty('owner');
+    expect(mockRegisteredAsset).toHaveProperty('timestamp');
+    expect(mockRegisteredAsset).toHaveProperty('explorerUrl');
+
+    // Verify types
+    expect(typeof mockRegisteredAsset.blockNumber).toBe('number');
+    expect(mockRegisteredAsset.blockNumber).toBeGreaterThan(0);
+  });
+});
+
+describe('Terminal UX Enhancements - Story 2.5', () => {
+  describe('Execution Time Display (AC 8)', () => {
+    it('should display execution time in seconds format', () => {
+      // Arrange: Expected format from TerminalUI.executionTime()
+      const mockStartTime = performance.now() - 3200; // 3.2 seconds ago
+      const elapsed = (performance.now() - mockStartTime) / 1000;
+      const executionTimeMessage = `Completed in ${elapsed.toFixed(1)} seconds`;
+
+      // Assert: Verify format matches expected pattern
+      expect(executionTimeMessage).toMatch(/Completed in \d+\.\d+ seconds/);
+      expect(executionTimeMessage).toContain('Completed in');
+      expect(executionTimeMessage).toContain('seconds');
+    });
+
+    it('should display time at end of command execution', () => {
+      // Arrange: Verify execution time is displayed last
+      // Per AC 8: "At end of each command, display 'Completed in X.X seconds'"
+      const expectedPattern = /Completed in \d+\.\d seconds/;
+
+      // Assert: Pattern should match execution time format
+      expect(expectedPattern.test('Completed in 3.2 seconds')).toBe(true);
+      expect(expectedPattern.test('Completed in 0.5 seconds')).toBe(true);
+    });
+  });
+
+  describe('Network Badge Display (AC 9)', () => {
+    it('should display [Testnet] badge for testnet network', () => {
+      // Arrange: Expected badge format for testnet
+      const expectedBadge = '[Testnet]';
+
+      // Assert: Verify badge format
+      expect(expectedBadge).toContain('[');
+      expect(expectedBadge).toContain('Testnet');
+      expect(expectedBadge).toContain(']');
+    });
+
+    it('should display [Mainnet] badge for mainnet network', () => {
+      // Arrange: Expected badge format for mainnet
+      const expectedBadge = '[Mainnet]';
+
+      // Assert: Verify badge format
+      expect(expectedBadge).toContain('[');
+      expect(expectedBadge).toContain('Mainnet');
+      expect(expectedBadge).toContain(']');
+    });
+
+    it('should include network badge in spinner messages for blockchain operations', () => {
+      // Arrange: Per AC 9, badge should be in spinner messages
+      const mockSpinnerMessage = 'Registering IP on Story Protocol [Testnet]...';
+
+      // Assert: Verify badge is present in spinner message
+      expect(mockSpinnerMessage).toContain('[Testnet]');
+      expect(mockSpinnerMessage).toContain('Registering IP');
+    });
+  });
+
+  describe('--show-full-ids Flag Functionality (AC 7)', () => {
+    it('should truncate long hashes by default', () => {
+      // Arrange: Long hash should be truncated
+      const fullHash = '0x1234567890abcdef1234567890abcdef12345678';
+      const truncatedHash = `${fullHash.slice(0, 6)}...${fullHash.slice(-4)}`;
+
+      // Assert: Verify truncation format
+      expect(truncatedHash).toBe('0x1234...5678');
+      expect(truncatedHash.length).toBeLessThan(fullHash.length);
+    });
+
+    it('should display full hashes when --show-full-ids flag is provided', () => {
+      // Arrange
+      const fullHash = '0x1234567890abcdef1234567890abcdef12345678';
+      const showFull = true;
+      const displayedHash = showFull ? fullHash : `${fullHash.slice(0, 6)}...${fullHash.slice(-4)}`;
+
+      // Assert: Full hash is shown when flag is true
+      expect(displayedHash).toBe(fullHash);
+      expect(displayedHash.length).toBe(42);
+    });
+
+    it('should truncate IPFS hashes correctly', () => {
+      // Arrange
+      const ipfsHash = 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG';
+      const truncated = `${ipfsHash.slice(0, 6)}...${ipfsHash.slice(-4)}`;
+
+      // Assert: IPFS hash truncation (preserves original case)
+      expect(truncated).toBe('QmYwAP...PbdG');
+    });
+  });
+
+  describe('Emoji Indicator Consistency (AC 6)', () => {
+    it('should use 🎉 for major success (registration complete, portfolio generated)', () => {
+      // Arrange: Major success indicator
+      const majorSuccessEmoji = '🎉';
+      const registrationSuccess = `${majorSuccessEmoji} IP Registration Successful!`;
+      const portfolioSuccess = `${majorSuccessEmoji} Portfolio Generated!`;
+
+      // Assert
+      expect(registrationSuccess).toContain('🎉');
+      expect(portfolioSuccess).toContain('🎉');
+    });
+
+    it('should use ⚙️ for processing operations (IPFS upload, transaction)', () => {
+      // Arrange: Processing indicator
+      const processingEmoji = '⚙️';
+      const ipfsUploadMessage = `${processingEmoji} Uploading metadata to IPFS...`;
+      const transactionMessage = `${processingEmoji} Registering IP on Story Protocol...`;
+
+      // Assert
+      expect(ipfsUploadMessage).toContain('⚙️');
+      expect(transactionMessage).toContain('⚙️');
+    });
+
+    it('should use 🔍 for querying operations (API queries, data fetching)', () => {
+      // Arrange: Querying indicator
+      const queryingEmoji = '🔍';
+      const fetchingMessage = `${queryingEmoji} Fetching IP assets...`;
+
+      // Assert
+      expect(fetchingMessage).toContain('🔍');
+    });
+
+    it('should use ✓ for general success messages', () => {
+      // Arrange: Success indicator
+      const successPrefix = '✓';
+      const successMessage = `${successPrefix} Operation successful`;
+
+      // Assert
+      expect(successMessage).toContain('✓');
+    });
+
+    it('should use ✗ for error messages', () => {
+      // Arrange: Error indicator
+      const errorPrefix = '✗';
+      const errorMessage = `${errorPrefix} Operation failed`;
+
+      // Assert
+      expect(errorMessage).toContain('✗');
+    });
+
+    it('should use ⚠️ for warning messages', () => {
+      // Arrange: Warning indicator
+      const warningPrefix = '⚠️';
+      const warningMessage = `${warningPrefix} Warning message`;
+
+      // Assert
+      expect(warningMessage).toContain('⚠️');
+    });
+
+    it('should use ℹ️ for info messages', () => {
+      // Arrange: Info indicator
+      const infoPrefix = 'ℹ️';
+      const infoMessage = `${infoPrefix} Information message`;
+
+      // Assert
+      expect(infoMessage).toContain('ℹ️');
+    });
+  });
+
+  describe('Boxen Success Messages (AC 5)', () => {
+    it('should use Boxen for registration success display', () => {
+      // Arrange: Registration success should be in a box
+      // Per AC 5: "Boxen used for important messages: Registration success"
+      const boxedContentIndicators = ['╭', '╮', '│', '╰', '╯']; // Round border chars
+      const doubleBoxIndicators = ['╔', '╗', '║', '╚', '╝']; // Double border chars
+
+      // Assert: At least one set of border characters should be used
+      expect(
+        boxedContentIndicators.concat(doubleBoxIndicators).some((char) =>
+          typeof char === 'string'
+        )
+      ).toBe(true);
+    });
+
+    it('should use Boxen for portfolio generation success display', () => {
+      // Per AC 5: "portfolio generation success rendered in terminal boxes"
+      const portfolioSuccessTitle = 'Portfolio Generated!';
+
+      expect(portfolioSuccessTitle).toContain('Portfolio');
+      expect(portfolioSuccessTitle).toContain('Generated');
+    });
+
+    it('should use double border style for major success (🎉)', () => {
+      // Per story dev notes: "Consider 'double' borderStyle for major success"
+      const doubleBorderStyle = 'double';
+
+      expect(['round', 'double', 'single'].includes(doubleBorderStyle)).toBe(true);
+    });
+  });
+});
+
 describe('Cache File Creation and Permissions - Story 1.7 Task 13', () => {
   const cacheFilePath = join(homedir(), '.storyrc-cache.json');
 

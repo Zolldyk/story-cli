@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IP Portfolio - 0x742d...bEb0</title>
+  <style>
+    :root {
+      --bg-primary: #ffffff;
+      --bg-secondary: #f5f5f5;
+      --text-primary: #1a1a1a;
+      --text-secondary: #666666;
+      --accent: #4CAF50;
+      --border: #e0e0e0;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-primary: #1a1a1a;
+        --bg-secondary: #2d2d2d;
+        --text-primary: #ffffff;
+        --text-secondary: #b0b0b0;
+        --accent: #66BB6A;
+        --border: #404040;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+      color: var(--text-secondary);
+    }
+
+    .wallet {
+      font-family: monospace;
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+    }
+
+    .network-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      background-color: var(--accent);
+      color: #fff;
+      border-radius: 1rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+
+    section {
+      margin-bottom: 3rem;
+    }
+
+    .statistics {
+      text-align: center;
+    }
+
+    .stats-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+    }
+
+    .stat-card {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      padding: 1.5rem 2rem;
+      min-width: 150px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .stat-label {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+    }
+
+    .graph {
+      text-align: center;
+    }
+
+    .mermaid, .svg-fallback, .html-fallback, .no-graph {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      padding: 2rem;
+      overflow-x: auto;
+    }
+
+    .no-graph {
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: var(--bg-secondary);
+      border-radius: 0.5rem;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background-color: var(--bg-primary);
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: var(--bg-primary);
+    }
+
+    tbody tr:hover {
+      background-color: rgba(76, 175, 80, 0.1);
+    }
+
+    .ip-id-cell {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .ip-id {
+      font-family: monospace;
+      font-size: 0.9rem;
+    }
+
+    .copy-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 0.25rem;
+      padding: 0.25rem;
+      cursor: pointer;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover {
+      background-color: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .copy-btn.copied {
+      background-color: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .no-assets {
+      text-align: center;
+      color: var(--text-secondary);
+      padding: 2rem;
+      background-color: var(--bg-secondary);
+      border-radius: 0.5rem;
+    }
+
+    footer {
+      text-align: center;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Responsive breakpoints */
+    @media (max-width: 1920px) {
+      body {
+        max-width: 1200px;
+      }
+    }
+
+    @media (max-width: 1440px) {
+      body {
+        max-width: 1000px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      .stats-grid {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .stat-card {
+        width: 100%;
+        max-width: 300px;
+      }
+
+      .ip-id-cell {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+      }
+    }
+
+    @media (max-width: 375px) {
+      body {
+        padding: 0.5rem;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      h2 {
+        font-size: 1.25rem;
+      }
+
+      .stat-card {
+        padding: 1rem;
+      }
+
+      .stat-value {
+        font-size: 1.5rem;
+      }
+
+      th, td {
+        padding: 0.5rem;
+        font-size: 0.875rem;
+      }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>IP Portfolio</h1>
+    <p class="wallet">0x742d...bEb0</p>
+    <span class="network-badge">testnet</span>
+  </header>
+
+  <section class="statistics">
+    <h2>Portfolio Statistics</h2>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value">7</div>
+        <div class="stat-label">Total Assets</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">3</div>
+        <div class="stat-label">Root Assets</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">4</div>
+        <div class="stat-label">Derivatives</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">12</div>
+        <div class="stat-label">Licenses Issued</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">450 IP</div>
+        <div class="stat-label">Total Royalties</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="graph">
+    <h2>Relationship Graph</h2>
+    <div class="mermaid">flowchart TD
+  node_a1b2c3d4[0xa1b2...c3d4]:::root
+  node_e5f6g7h8[0xe5f6...g7h8]:::root
+  node_i9j0k1l2[0xi9j0...k1l2]:::root
+  node_m3n4o5p6[0xm3n4...o5p6]:::derivative
+  node_q7r8s9t0[0xq7r8...s9t0]:::leaf
+  node_u1v2w3x4[0xu1v2...w3x4]:::derivative
+  node_y5z6a7b8[0xy5z6...a7b8]:::leaf
+  node_a1b2c3d4 --> node_m3n4o5p6
+  node_m3n4o5p6 --> node_q7r8s9t0
+  node_e5f6g7h8 --> node_u1v2w3x4
+  node_u1v2w3x4 --> node_y5z6a7b8
+
+  classDef root fill:#4CAF50,stroke:#2E7D32,color:#fff
+  classDef derivative fill:#2196F3,stroke:#1565C0,color:#fff
+  classDef leaf fill:#FF9800,stroke:#EF6C00,color:#fff</div>
+  </section>
+
+  <section class="assets">
+    <h2>IP Assets</h2>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>IP ID</th>
+            <th>License Type</th>
+            <th>Created</th>
+            <th>Derivatives</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="ip-id-cell">
+              <span class="ip-id" title="0xa1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2">0xa1b2...a1b2</span>
+              <button class="copy-btn" onclick="copyToClipboard('0xa1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2')" title="Copy full IP ID">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+                </svg>
+              </button>
+            </td>
+            <td>CC-BY</td>
+            <td>Jan 15, 2024, 10:30 AM</td>
+            <td>1</td>
+          </tr>
+          <tr>
+            <td class="ip-id-cell">
+              <span class="ip-id" title="0xe5f6g7h8i9j0e5f6g7h8i9j0e5f6g7h8i9j0e5f6">0xe5f6...e5f6</span>
+              <button class="copy-btn" onclick="copyToClipboard('0xe5f6g7h8i9j0e5f6g7h8i9j0e5f6g7h8i9j0e5f6')" title="Copy full IP ID">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+                </svg>
+              </button>
+            </td>
+            <td>NCSA</td>
+            <td>Feb 20, 2024, 2:15 PM</td>
+            <td>1</td>
+          </tr>
+          <tr>
+            <td class="ip-id-cell">
+              <span class="ip-id" title="0xi9j0k1l2m3n4i9j0k1l2m3n4i9j0k1l2m3n4i9j0">0xi9j0...i9j0</span>
+              <button class="copy-btn" onclick="copyToClipboard('0xi9j0k1l2m3n4i9j0k1l2m3n4i9j0k1l2m3n4i9j0')" title="Copy full IP ID">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+                </svg>
+              </button>
+            </td>
+            <td>Exclusive</td>
+            <td>Mar 10, 2024, 9:00 AM</td>
+            <td>0</td>
+          </tr>
+          <tr>
+            <td class="ip-id-cell">
+              <span class="ip-id" title="0xm3n4o5p6q7r8m3n4o5p6q7r8m3n4o5p6q7r8m3n4">0xm3n4...m3n4</span>
+              <button class="copy-btn" onclick="copyToClipboard('0xm3n4o5p6q7r8m3n4o5p6q7r8m3n4o5p6q7r8m3n4')" title="Copy full IP ID">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+                </svg>
+              </button>
+            </td>
+            <td>CC-BY</td>
+            <td>Apr 5, 2024, 11:45 AM</td>
+            <td>1</td>
+          </tr>
+          <tr>
+            <td class="ip-id-cell">
+              <span class="ip-id" title="0xq7r8s9t0u1v2q7r8s9t0u1v2q7r8s9t0u1v2q7r8">0xq7r8...q7r8</span>
+              <button class="copy-btn" onclick="copyToClipboard('0xq7r8s9t0u1v2q7r8s9t0u1v2q7r8s9t0u1v2q7r8')" title="Copy full IP ID">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+                </svg>
+              </button>
+            </td>
+            <td>CC-BY</td>
+            <td>May 12, 2024, 3:30 PM</td>
+            <td>0</td>
+          </tr>
+          <tr>
+            <td class="ip-id-cell">
+              <span class="ip-id" title="0xu1v2w3x4y5z6u1v2w3x4y5z6u1v2w3x4y5z6u1v2">0xu1v2...u1v2</span>
+              <button class="copy-btn" onclick="copyToClipboard('0xu1v2w3x4y5z6u1v2w3x4y5z6u1v2w3x4y5z6u1v2')" title="Copy full IP ID">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+                </svg>
+              </button>
+            </td>
+            <td>NCSA</td>
+            <td>Jun 18, 2024, 8:15 AM</td>
+            <td>1</td>
+          </tr>
+          <tr>
+            <td class="ip-id-cell">
+              <span class="ip-id" title="0xy5z6a7b8c9d0y5z6a7b8c9d0y5z6a7b8c9d0y5z6">0xy5z6...y5z6</span>
+              <button class="copy-btn" onclick="copyToClipboard('0xy5z6a7b8c9d0y5z6a7b8c9d0y5z6a7b8c9d0y5z6')" title="Copy full IP ID">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+                </svg>
+              </button>
+            </td>
+            <td>NCSA</td>
+            <td>Jul 25, 2024, 4:00 PM</td>
+            <td>0</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    Generated by <a href="https://github.com/storyprotocol/story-cli">Story CLI</a> on Nov 25, 2024
+  </footer>
+
+  <script>
+    mermaid.initialize({ startOnLoad: true });
+
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(function() {
+        // Find the button that was clicked
+        var buttons = document.querySelectorAll('.copy-btn');
+        buttons.forEach(function(btn) {
+          if (btn.onclick && btn.onclick.toString().includes(text)) {
+            btn.classList.add('copied');
+            var originalHTML = btn.innerHTML;
+            btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+            setTimeout(function() {
+              btn.classList.remove('copied');
+              btn.innerHTML = originalHTML;
+            }, 1500);
+          }
+        });
+      }).catch(function(err) {
+        console.error('Failed to copy: ', err);
+      });
+    }
+
+    // Add click listeners after DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      var buttons = document.querySelectorAll('.copy-btn');
+      buttons.forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+        });
+      });
+    });
+  </script>
+</body>
+</html>

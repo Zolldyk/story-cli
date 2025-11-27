@@ -38,7 +38,7 @@ describe('Node.js Version Validation Integration', () => {
     });
 
     // Assert: CLI loaded successfully and returned version
-    expect(result).toContain('1.0.0');
+    expect(result).toContain('0.1.0');
   });
 
   it('should fail with Node.js version 17 (edge case)', () => {

@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 
-import { Command } from 'commander';
+import { Command, Help } from 'commander';
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import chalk from 'chalk';
 import { createConfigCommand } from './commands/config.js';
 import { createRegisterCommand } from './commands/register.js';
 import { registerStatusCommand } from './commands/status.js';
+import { createPortfolioCommand } from './commands/portfolio.js';
 import { TerminalUI } from './lib/terminal-ui.js';
 import { handleError } from './lib/error-handler.js';
 import { EXIT_CODE_USER_ERROR } from './types/errors.js';
@@ -55,6 +57,10 @@ const packageJson = JSON.parse(
 
 const program = new Command();
 
+/**
+ * Custom help formatter for styled terminal output
+ * Source: Story 2.5 AC 10
+ */
 program
   .name('story')
   .description(
@@ -62,6 +68,85 @@ program
   )
   .version(packageJson.version, '-v, --version', 'Display current version')
   .option('--debug', 'Enable debug mode with verbose output and stack traces')
+  .configureHelp({
+    subcommandTerm: (cmd: Command): string => chalk.bold(cmd.name()),
+    optionTerm: (option): string => chalk.cyan(option.flags),
+    formatHelp: (cmd: Command, helper: Help): string => {
+      const termWidth = helper.padWidth(cmd, helper);
+
+      // Get command components
+      const usage = helper.commandUsage(cmd);
+      const description = helper.commandDescription(cmd);
+      const args = helper.visibleArguments(cmd);
+      const options = helper.visibleOptions(cmd);
+      const commands = helper.visibleCommands(cmd);
+      const globalOptions = helper.visibleGlobalOptions(cmd);
+
+      // Build formatted output
+      const output: string[] = [];
+
+      // Usage section
+      output.push(chalk.bold.white('Usage:'));
+      output.push(`  ${usage}`);
+      output.push('');
+
+      // Description
+      if (description) {
+        output.push(chalk.bold.white('Description:'));
+        output.push(`  ${description}`);
+        output.push('');
+      }
+
+      // Arguments
+      if (args.length > 0) {
+        output.push(chalk.bold.white('Arguments:'));
+        args.forEach((arg) => {
+          const argTerm = helper.argumentTerm(arg);
+          const argDescription = helper.argumentDescription(arg);
+          output.push(`  ${chalk.cyan(argTerm)}${' '.repeat(Math.max(2, termWidth - argTerm.length + 2))}${argDescription}`);
+        });
+        output.push('');
+      }
+
+      // Commands section
+      if (commands.length > 0) {
+        output.push(chalk.bold.white('Commands:'));
+        commands.forEach((subCmd) => {
+          const cmdTerm = helper.subcommandTerm(subCmd);
+          const cmdDescription = helper.subcommandDescription(subCmd);
+          const rawCmdTerm = subCmd.name();
+          output.push(`  ${cmdTerm}${' '.repeat(Math.max(2, termWidth - rawCmdTerm.length + 2))}${cmdDescription}`);
+        });
+        output.push('');
+      }
+
+      // Options section
+      if (options.length > 0) {
+        output.push(chalk.bold.white('Options:'));
+        options.forEach((option) => {
+          const optTerm = helper.optionTerm(option);
+          const optDescription = helper.optionDescription(option);
+          const rawFlags = option.flags;
+          output.push(`  ${optTerm}${' '.repeat(Math.max(2, termWidth - rawFlags.length + 2))}${optDescription}`);
+        });
+        output.push('');
+      }
+
+      // Global options section
+      if (globalOptions.length > 0) {
+        output.push(chalk.bold.white('Global Options:'));
+        globalOptions.forEach((option) => {
+          const optTerm = helper.optionTerm(option);
+          const optDescription = helper.optionDescription(option);
+          const rawFlags = option.flags;
+          output.push(`  ${optTerm}${' '.repeat(Math.max(2, termWidth - rawFlags.length + 2))}${optDescription}`);
+        });
+        output.push('');
+      }
+
+      return output.join('\n');
+    },
+  })
   .hook('preAction', (thisCommand) => {
     // Enable debug mode if --debug flag is present or DEBUG env var is set
     const debugFlag = thisCommand.opts().debug || process.env.DEBUG === 'true';
@@ -75,13 +160,8 @@ program
 // Register command
 program.addCommand(createRegisterCommand());
 
-// Portfolio command placeholder
-program
-  .command('portfolio')
-  .description('Generate and view your IP asset portfolio')
-  .action(() => {
-    TerminalUI.info('Portfolio command - To be implemented in future stories');
-  });
+// Portfolio command
+program.addCommand(createPortfolioCommand());
 
 // Status command
 registerStatusCommand(program);

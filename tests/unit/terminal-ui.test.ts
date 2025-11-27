@@ -257,4 +257,208 @@ describe('TerminalUI', () => {
       promptSpy.mockRestore();
     });
   });
+
+  // Story 2.5: New UX Enhancement Methods
+
+  describe('networkBadge()', () => {
+    it('should return cyan badge for testnet', () => {
+      // Arrange
+      const network = 'testnet';
+
+      // Act
+      const badge = TerminalUI.networkBadge(network);
+
+      // Assert
+      expect(badge).toContain('[Testnet]');
+    });
+
+    it('should return magenta badge for mainnet', () => {
+      // Arrange
+      const network = 'mainnet';
+
+      // Act
+      const badge = TerminalUI.networkBadge(network);
+
+      // Assert
+      expect(badge).toContain('[Mainnet]');
+    });
+
+    it('should be case-insensitive for network name', () => {
+      // Arrange
+      const network = 'MAINNET';
+
+      // Act
+      const badge = TerminalUI.networkBadge(network);
+
+      // Assert
+      expect(badge).toContain('[Mainnet]');
+    });
+
+    it('should default to testnet for unknown network', () => {
+      // Arrange
+      const network = 'unknown';
+
+      // Act
+      const badge = TerminalUI.networkBadge(network);
+
+      // Assert
+      expect(badge).toContain('[Testnet]');
+    });
+  });
+
+  describe('majorSuccess()', () => {
+    it('should output boxed message with celebration emoji', () => {
+      // Arrange
+      const title = 'Success';
+      const content = 'Operation completed successfully';
+
+      // Act
+      TerminalUI.majorSuccess(title, content);
+
+      // Assert
+      expect(consoleLogSpy).toHaveBeenCalledTimes(1);
+      const output = consoleLogSpy.mock.calls[0][0];
+      expect(output).toContain('🎉');
+      expect(output).toContain(title);
+      expect(output).toContain(content);
+    });
+  });
+
+  describe('processing()', () => {
+    it('should create spinner with gear emoji', () => {
+      // Arrange
+      const message = 'Uploading to IPFS';
+
+      // Act
+      const spinner = TerminalUI.processing(message);
+
+      // Assert
+      expect(spinner).toBeDefined();
+      expect(spinner.text).toContain('⚙️');
+      expect(spinner.text).toContain(message);
+    });
+
+    it('should create spinner with cyan color', () => {
+      // Arrange
+      const message = 'Processing';
+
+      // Act
+      const spinner = TerminalUI.processing(message);
+
+      // Assert
+      expect(spinner.color).toBe('cyan');
+    });
+  });
+
+  describe('querying()', () => {
+    it('should create spinner with magnifying glass emoji', () => {
+      // Arrange
+      const message = 'Fetching IP assets';
+
+      // Act
+      const spinner = TerminalUI.querying(message);
+
+      // Assert
+      expect(spinner).toBeDefined();
+      expect(spinner.text).toContain('🔍');
+      expect(spinner.text).toContain(message);
+    });
+
+    it('should create spinner with cyan color', () => {
+      // Arrange
+      const message = 'Querying';
+
+      // Act
+      const spinner = TerminalUI.querying(message);
+
+      // Assert
+      expect(spinner.color).toBe('cyan');
+    });
+  });
+
+  describe('executionTime()', () => {
+    it('should format execution time in seconds', () => {
+      // Arrange
+      // Mock performance.now to return a known value
+      const startTime = performance.now() - 3200; // Simulate 3.2 seconds ago
+
+      // Act
+      const result = TerminalUI.executionTime(startTime);
+
+      // Assert
+      expect(result).toContain('Completed in');
+      expect(result).toContain('seconds');
+    });
+
+    it('should format with one decimal place', () => {
+      // Arrange
+      const mockStartTime = performance.now() - 1500; // 1.5 seconds ago
+
+      // Act
+      const result = TerminalUI.executionTime(mockStartTime);
+
+      // Assert
+      // Should contain a decimal number like "1.5"
+      expect(result).toMatch(/\d+\.\d/);
+    });
+  });
+
+  describe('truncateHash()', () => {
+    it('should truncate long hash to 0x1234...5678 format', () => {
+      // Arrange
+      const hash = '0x1234567890abcdef1234567890abcdef12345678';
+
+      // Act
+      const truncated = TerminalUI.truncateHash(hash);
+
+      // Assert
+      expect(truncated).toBe('0x1234...5678');
+    });
+
+    it('should return full hash when showFull is true', () => {
+      // Arrange
+      const hash = '0x1234567890abcdef1234567890abcdef12345678';
+
+      // Act
+      const result = TerminalUI.truncateHash(hash, true);
+
+      // Assert
+      expect(result).toBe(hash);
+    });
+
+    it('should not truncate short hashes (14 chars or less)', () => {
+      // Arrange
+      const shortHash = '0x12345678';
+
+      // Act
+      const result = TerminalUI.truncateHash(shortHash);
+
+      // Assert
+      expect(result).toBe(shortHash);
+    });
+
+    it('should preserve first 6 characters and last 4 characters', () => {
+      // Arrange
+      const hash = 'QmXYZ123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+      // Act
+      const truncated = TerminalUI.truncateHash(hash);
+
+      // Assert
+      expect(truncated.startsWith('QmXYZ1')).toBe(true);
+      expect(truncated.endsWith('WXYZ')).toBe(true);
+      expect(truncated).toContain('...');
+    });
+
+    it('should handle IPFS hashes', () => {
+      // Arrange
+      const ipfsHash = 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG';
+
+      // Act
+      const truncated = TerminalUI.truncateHash(ipfsHash);
+
+      // Assert - preserves original case (last 4 chars are "PbdG" not "pbdG")
+      expect(truncated).toBe('QmYwAP...PbdG');
+    });
+  });
 });

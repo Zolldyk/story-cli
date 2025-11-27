@@ -6,20 +6,20 @@ CLI tool for Story Protocol - Register and manage IP assets on the blockchain
 
 ## Overview
 
-**Story CLI** is a unified command-line toolkit that transforms the developer experience for Story Protocol by providing guided workflows for the complete IP lifecycle—from registration through monitoring and distribution. Built for Story Protocol—the blockchain for programmable IP—this tool wraps Story Protocol's robust SDK functions in intuitive, interactive commands that make IP management feel like a conversation rather than a technical chore. Get your first IP asset registered in under 5 minutes with zero blockchain expertise required.
+**Story CLI** is a unified command-line toolkit that transforms the developer experience for Story Protocol by providing guided workflows for the complete IP lifecycle—from registration through monitoring and distribution. Built for Story Protocol — the blockchain for programmable IP — this tool wraps Story Protocol's robust SDK functions in intuitive, interactive commands that make IP management feel like a conversation rather than a technical chore. Get your first IP asset registered in under 5 minutes with zero blockchain expertise required.
 
 Learn more about Story Protocol at [https://docs.story.foundation](https://docs.story.foundation)
 
 ## Features
 
-- **Interactive Registration Wizard** - Guided prompts walk you through license selection, metadata input, and transaction signing with smart defaults and validation
-- **Multiple PIL License Configurations** - Support for commercial use, derivatives permissions, and configurable royalty percentages (0-100%)
-- **IPFS Metadata Storage Integration** - Automatic metadata uploads to IPFS via Pinata with free tier support (1GB storage)
-- **Blockchain Transaction Execution** - Seamless integration with Story Protocol SDK for secure IP asset registration on testnet or mainnet
-- **Beautiful Terminal UI** - Progress spinners, success celebrations with Boxen formatting, and color-coded output for exceptional developer experience
-- **Persistent Configuration Management** - Secure config file storage at `~/.storyrc` with 600 permissions and environment variable overrides
-- **Mock Mode for Offline Development** - Test registration flows without blockchain transactions using `STORY_CLI_MOCK=true`
-- **Debug Mode with Verbose Logging** - Comprehensive troubleshooting with `--debug` flag showing SDK calls, API requests, and full stack traces
+- **Interactive registration wizard** - Guided prompts walk you through license selection, metadata input, and transaction signing with smart defaults and validation
+- **Multiple PIL license configurations** - Support for commercial use, derivatives permissions, and configurable royalty percentages (0-100%)
+- **IPFS metadata storage integration** - Automatic metadata uploads to IPFS via Pinata with free tier support (1GB storage)
+- **Blockchain transaction execution** - Seamless integration with Story Protocol SDK for secure IP asset registration on testnet or mainnet
+- **Beautiful terminal UI** - Progress spinners, success celebrations with Boxen formatting, and color-coded output for exceptional developer experience
+- **Persistent configuration management** - Secure config file storage at `~/.storyrc` with 600 permissions and environment variable overrides
+- **Mock mode for offline development** - Test registration flows without blockchain transactions using `STORY_CLI_MOCK=true`
+- **Debug mode with verbose logging** - Comprehensive troubleshooting with `--debug` flag showing SDK calls, API requests, and full stack traces
 
 ## Installation
 
@@ -34,13 +34,13 @@ Before installing Story CLI, ensure you have:
 
 **Note:** Start with Story Protocol testnet to avoid real gas costs during development and testing.
 
-### Install Globally
+### Install globally
 
 ```bash
 npm install -g story-cli
 ```
 
-### Verify Installation
+### Verify installation
 
 ```bash
 story --version
@@ -48,17 +48,17 @@ story --version
 
 You should see the current version number displayed. If the command is not found, ensure your npm global bin directory is in your PATH.
 
-### Get Testnet Funds
+### Get testnet funds
 
 For testing on Story Protocol testnet, get free testnet tokens from the faucet:
 
-**Story Protocol Testnet Faucet:** [https://faucet.story.foundation](https://faucet.story.foundation)
+**Story protocol testnet faucet:** [https://faucet.story.foundation](https://faucet.story.foundation)
 
 You'll need testnet funds to pay for gas fees when registering IP assets.
 
-## Quick Start
+## Quick start
 
-### First Registration in Under 5 Minutes
+### First registration in under 5 minutes
 
 Follow these steps to register your first IP asset on Story Protocol:
 
@@ -75,17 +75,17 @@ story --version
 # Output: 1.0.0
 ```
 
-#### Step 2: Get Testnet Wallet and Funds
+#### Step 2: Get testnet wallet and funds
 
 1. Create an Ethereum wallet or use an existing one
 2. Visit the Story Protocol testnet faucet: [https://faucet.story.foundation](https://faucet.story.foundation)
 3. Request testnet tokens for gas fees
 
-#### Step 3: Get Pinata API Credentials
+#### Step 3: Get Pinata API credentials
 
 1. Sign up for a free Pinata account at [https://pinata.cloud](https://pinata.cloud)
-2. Navigate to API Keys section
-3. Create a new API key and save both the **API Key** and **API Secret**
+2. Navigate to API keys section
+3. Create a new API key and save both the **API key** and **API secret**
 
 #### Step 4: Configure the CLI
 
@@ -115,7 +115,7 @@ Expected output:
 }
 ```
 
-#### Step 5: Register Your First IP Asset
+#### Step 5: Register your first IP asset
 
 Run the interactive registration command with the path to your file:
 
@@ -127,22 +127,22 @@ Replace `./my-artwork.jpg` with the path to your actual file (image, audio, vide
 
 You'll be guided through a series of prompts:
 
-1. **License Configuration:**
+1. **License configuration:**
    - Allow commercial use? (Yes/No)
    - Allow derivatives? (Yes/No)
    - Royalty percentage? (0-100)
 
-2. **Metadata Input:**
-   - IP asset name (e.g., "My First NFT Collection")
+2. **Metadata input:**
+   - IP asset name (e.g., "My first NFT collection")
    - Description (optional)
    - Image IPFS hash (optional)
 
-3. **Transaction Summary:**
+3. **Transaction summary:**
    - Review license terms
    - View estimated gas costs
    - Confirm transaction
 
-#### Step 6: View Success Message
+#### Step 6: View success message
 
 After successful registration, you'll see:
 
@@ -159,7 +159,7 @@ After successful registration, you'll see:
 └──────────────────────────────────────────────────────┘
 ```
 
-#### Metadata Structure Example
+#### Metadata structure example
 
 When you provide metadata, it's uploaded to IPFS in this format:
 
@@ -194,32 +194,32 @@ story register <file-path> [options]
 - `--metadata-hash <hash>` - Pre-uploaded IPFS metadata hash (skips metadata prompts and upload). Use this to retry failed transactions without re-uploading metadata.
 - `--debug` - Enable debug mode with verbose output and stack traces
 
-**Interactive Workflow:**
+**Interactive workflow:**
 
 When you run `story register`, you'll be guided through an interactive wizard:
 
-1. **License Configuration:**
+1. **License configuration:**
    - Allow commercial use? (Yes/No)
    - Allow derivatives? (Yes/No)
    - Royalty percentage? (0-100%) - Only shown if derivatives are allowed
 
-2. **Metadata Input:**
+2. **Metadata input:**
    - IP asset name (required)
    - Description (optional)
    - Image IPFS hash (optional)
 
-3. **Transaction Summary:**
+3. **Transaction summary:**
    - License type confirmation
    - Royalty percentage (if applicable)
    - Metadata IPFS hash
    - Network and gas estimate
 
-4. **Blockchain Transaction:**
+4. **Blockchain transaction:**
    - Gas balance check
    - Transaction execution
    - Success confirmation with IP ID and explorer link
 
-**Example Usage:**
+**Example usage:**
 
 ```bash
 # Basic registration with interactive prompts
@@ -232,17 +232,17 @@ story register ./my-song.mp3 --debug
 story register ./my-artwork.jpg --metadata-hash QmXXX...ABC
 ```
 
-**Environment Variables:**
+**Environment variables:**
 - `STORY_PRIVATE_KEY` - Private key for transaction signing (required)
 - `STORY_CLI_MOCK` - Set to `true` for offline testing with mock data
 - `PINATA_API_KEY` - Pinata API key for IPFS uploads
 - `PINATA_API_SECRET` - Pinata API secret for IPFS uploads
 
-**License Configuration Examples:**
+**License configuration examples:**
 
-1. **Non-Commercial Only:**
+1. **Non-commercial only:**
    - Commercial use: No
-   - Result: Non-Commercial Social Remixing (PIL) license
+   - Result: Non-commercial social remixing (PIL) license
 
 2. **Commercial with Derivatives (10% Royalty):**
    - Commercial use: Yes
@@ -255,7 +255,7 @@ story register ./my-artwork.jpg --metadata-hash QmXXX...ABC
    - Derivatives: No
    - Result: Commercial Use license without derivative rights
 
-**Expected Workflow:**
+**Expected workflow:**
 ```bash
 $ story register ./my-artwork.jpg
 
@@ -346,12 +346,12 @@ story status
 - Gas balance in ETH
 - Low gas warning (if balance < 0.001 ETH)
 
-**Example Output:**
+**Example output:**
 
 ```bash
 $ story status
 
-✓ Wallet Connected
+✓ Wallet connected
 
 Address: 0x1234...5678
 Network: testnet
@@ -363,23 +363,86 @@ Gas Balance: 0.500000 ETH
 
 ### `story portfolio`
 
-Generate and view your IP asset portfolio.
+Generate an interactive HTML portfolio of your registered IP assets on Story Protocol.
 
-**Status:** 🚧 Coming in Epic 2 - Future Release
-
-This command will generate interactive visualizations of your registered IP assets, including:
-- Relationship graphs showing parent-child IP dependencies
-- License term summaries
-- Transaction history
-- HTML portfolio export
-
-**Placeholder:**
+**Usage:**
 ```bash
-story portfolio
-# Output: Portfolio command - To be implemented in future stories
+story portfolio [options]
 ```
 
-### Global Options
+**Options:**
+- `--output <path>` - Specify HTML output location (default: `./story-portfolio.html`)
+- `--show-full-ids` - Display full IP IDs and transaction hashes without truncation
+- `--debug` - Enable debug mode with verbose output
+
+**What it generates:**
+- Interactive HTML dashboard with your IP assets
+- Mermaid.js relationship graph showing parent-child IP dependencies
+- Statistics panel (total assets, root assets, derivatives, licenses issued)
+- Dark mode support with toggle
+- Mobile-responsive design
+
+**Prerequisites:**
+- `STORY_PRIVATE_KEY` environment variable must be set
+- `walletAddress` configured via `story config set walletAddress <address>`
+- Active network connection to Story Protocol
+
+**Example usage:**
+
+```bash
+# Generate portfolio with default output location
+story portfolio
+
+# Specify custom output path
+story portfolio --output ./my-portfolio.html
+
+# Show full IP IDs and transaction hashes
+story portfolio --show-full-ids
+
+# Debug mode for troubleshooting
+story portfolio --debug
+```
+
+**Expected workflow:**
+```bash
+$ story portfolio
+
+ℹ [TESTNET] Generating portfolio
+⠋ Fetching IP assets [TESTNET]...
+✓ Found 7 assets
+⠋ Building visualization graph...
+✓ Visualization graph built
+⠋ Generating HTML portfolio...
+✓ HTML portfolio generated
+
+┌──────────────────────────────────────────────────────┐
+│                                                      │
+│   🎉 Portfolio Generated!                           │
+│                                                      │
+│   7 IP assets found                                 │
+│   4 root, 3 derivatives                             │
+│                                                      │
+│   Output: ./story-portfolio.html                    │
+│   Open in browser to view your portfolio            │
+│                                                      │
+└──────────────────────────────────────────────────────┘
+
+⏱ Completed in 2.34s
+```
+
+**Empty portfolio:**
+
+If no IP assets are found for your wallet:
+```bash
+$ story portfolio
+ℹ No IP assets found for your wallet. Register your first IP with `story register`
+```
+
+**Sample output:**
+
+See [examples/sample-portfolio.html](examples/sample-portfolio.html) for a demo portfolio showing 7 IP assets with derivative relationships, statistics dashboard, and interactive graph visualization.
+
+### Global options
 
 **`--help` / `-h`**
 Display help information for any command:
@@ -414,11 +477,11 @@ Debug mode outputs:
 - Full stack traces
 - Detailed validation steps
 
-## Debug Mode
+## Debug mode
 
 Debug mode provides verbose output for troubleshooting issues with the CLI.
 
-### Enabling Debug Mode
+### Enabling debug mode
 
 You can enable debug mode in two ways:
 
@@ -434,7 +497,7 @@ You can enable debug mode in two ways:
    story register
    ```
 
-### What Debug Mode Outputs
+### What debug mode outputs
 
 When debug mode is enabled, you'll see:
 
@@ -443,7 +506,7 @@ When debug mode is enabled, you'll see:
 - **Full stack traces** - Complete error stack traces for debugging
 - **Detailed validation steps** - Step-by-step validation output
 
-### Example Usage
+### Example usage
 
 ```bash
 # Enable debug mode for a register command
@@ -460,9 +523,9 @@ $ story register --debug
 
 This section covers common errors you may encounter and how to resolve them. Each error follows a three-part format: what went wrong, why it matters, and how to fix it.
 
-### Common Errors
+### Common errors
 
-#### Missing Configuration Values
+#### Missing configuration values
 
 **Error:**
 ```
@@ -490,7 +553,7 @@ export PINATA_API_SECRET="your_api_secret"
 export STORY_PRIVATE_KEY="0xYOUR_PRIVATE_KEY"
 ```
 
-#### Invalid Wallet Address Format
+#### Invalid wallet address format
 
 **Error:**
 ```
@@ -515,7 +578,7 @@ Example: 0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb
 
 Valid example: `0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb`
 
-#### Network Connectivity Failures
+#### Network connectivity failures
 
 **Error:**
 ```
@@ -541,7 +604,7 @@ Check your internet connection or try a custom RPC URL
    ```
 4. **Check firewall** - Ensure your firewall isn't blocking HTTPS connections
 
-#### Insufficient Gas Balance
+#### Insufficient gas balance
 
 **Error:**
 ```
@@ -556,19 +619,19 @@ Get testnet funds: https://faucet.story.foundation
 
 **How to fix:**
 
-**For Testnet:**
+**For testnet:**
 1. Visit the Story Protocol testnet faucet: [https://faucet.story.foundation](https://faucet.story.foundation)
 2. Enter your wallet address
 3. Request testnet tokens (free)
 4. Wait 1-2 minutes for tokens to arrive
 5. Verify balance: `story status`
 
-**For Mainnet:**
+**For mainnet:**
 1. Purchase ETH from a cryptocurrency exchange
 2. Transfer ETH to your wallet address
 3. Ensure you have at least 0.001 ETH (sufficient for ~5 transactions)
 
-#### Invalid IPFS Hash Format
+#### Invalid IPFS hash format
 
 **Error:**
 ```
@@ -597,7 +660,7 @@ Example: QmXXX...ABC or ipfs://QmXXX...ABC
    story register --metadata-hash QmYOUR_VALID_HASH
    ```
 
-#### Transaction Revert Errors
+#### Transaction revert errors
 
 **Error:**
 ```
@@ -635,7 +698,7 @@ The transaction was rejected by the Story Protocol smart contract
 
 6. **Contact support** - If the issue persists, report it with debug logs
 
-#### Rate Limiting (Pinata API)
+#### Rate limiting (Pinata API)
 
 **Error:**
 ```
@@ -654,10 +717,10 @@ Too many requests to Pinata API. Wait 60 seconds and try again.
    ```bash
    story register --metadata-hash QmYOUR_EXISTING_HASH
    ```
-3. **Upgrade Pinata plan** - For higher rate limits, upgrade at [pinata.cloud](https://pinata.cloud)
+3. **Upgrade pinata plan** - For higher rate limits, upgrade at [pinata.cloud](https://pinata.cloud)
 4. **Reduce concurrent uploads** - Don't run multiple registrations simultaneously
 
-#### Command Not Found / Typos
+#### Command not found / Typos
 
 **Error:**
 ```
@@ -679,6 +742,216 @@ Did you mean 'register'?
    ```
 
 Valid commands: `register`, `portfolio`, `status`, `config`
+
+#### Installation permission errors
+
+**Error:**
+```
+npm ERR! Error: EACCES: permission denied, mkdir '/usr/local/lib/node_modules/story-cli'
+```
+
+**What went wrong:** npm doesn't have permission to install global packages in the system directory.
+
+**Why it matters:** Without proper permissions, Story CLI cannot be installed globally and the `story` command won't be available.
+
+**How to fix:**
+
+Option 1 - Fix npm permissions (recommended):
+```bash
+mkdir ~/.npm-global
+npm config set prefix '~/.npm-global'
+echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.bashrc
+source ~/.bashrc
+npm install -g story-cli
+```
+
+Option 2 - Use sudo (not recommended):
+```bash
+sudo npm install -g story-cli
+```
+
+Option 3 - Use npx without global install:
+```bash
+npx story-cli register ./my-file.jpg
+```
+
+#### Node.js version incompatibility
+
+**Error:**
+```
+error story-cli@0.1.0: The engine "node" is incompatible with this module.
+Expected version ">=18.0.0". Got "16.14.0"
+```
+
+**What went wrong:** Your Node.js version is older than the minimum required version (18.0.0).
+
+**Why it matters:** Story CLI uses modern JavaScript features and APIs only available in Node.js 18+.
+
+**How to fix:**
+
+1. **Check your current version:**
+   ```bash
+   node --version
+   ```
+
+2. **Update Node.js:**
+   - Download from [nodejs.org](https://nodejs.org/) (LTS version 20.x recommended)
+   - Or use a version manager like nvm:
+     ```bash
+     nvm install 20
+     nvm use 20
+     ```
+
+3. **Verify and reinstall:**
+   ```bash
+   node --version  # Should show v18.x.x or higher
+   npm install -g story-cli
+   ```
+
+#### File not found (Register command)
+
+**Error:**
+```
+File not found: ./my-artwork.jpg
+Please provide a valid file path
+```
+
+**What went wrong:** The file path you provided to the register command doesn't exist or is inaccessible.
+
+**Why it matters:** Story CLI needs to read the file to calculate its hash and include it in the IP registration metadata.
+
+**How to fix:**
+
+1. **Verify the file exists:**
+   ```bash
+   ls -la ./my-artwork.jpg
+   ```
+
+2. **Check the path:**
+   - Use absolute paths to avoid confusion: `/Users/you/Documents/my-artwork.jpg`
+   - Ensure no typos in the filename
+   - Check file extension matches exactly
+
+3. **Check permissions:**
+   ```bash
+   # File should be readable
+   ls -la ./my-artwork.jpg
+   # Should show 'r' in permissions: -rw-r--r--
+   ```
+
+4. **Try with quotes for paths with spaces:**
+   ```bash
+   story register "./My Artwork File.jpg"
+   ```
+
+#### Large file upload timeout
+
+**Error:**
+```
+Request timeout: IPFS upload took longer than 60 seconds
+Consider compressing your file or checking your internet connection
+```
+
+**What went wrong:** The file upload to Pinata/IPFS exceeded the timeout limit, typically due to large file size or slow connection.
+
+**Why it matters:** The metadata cannot be stored on IPFS, blocking the IP registration process.
+
+**How to fix:**
+
+1. **Check file size:**
+   ```bash
+   ls -lh ./my-file.jpg
+   # Recommended: Keep files under 50MB for reliable uploads
+   ```
+
+2. **Compress large files:**
+   - Images: Use tools like ImageOptim, TinyPNG, or `convert` (ImageMagick)
+   - Videos: Consider linking to external hosting instead of embedding
+
+3. **Check internet connection:**
+   - Test upload speed at speedtest.net
+   - Try on a different network if available
+
+4. **Retry the upload:**
+   - Temporary network issues often resolve on retry
+   - If IPFS upload succeeded before failure, use `--metadata-hash` to skip re-upload
+
+#### JSON config parse error
+
+**Error:**
+```
+Failed to parse configuration file
+SyntaxError: Unexpected token '}' at position 156
+```
+
+**What went wrong:** The `~/.storyrc` configuration file contains invalid JSON syntax.
+
+**Why it matters:** Story CLI cannot read your configuration, preventing all commands from working.
+
+**How to fix:**
+
+1. **View your config file:**
+   ```bash
+   cat ~/.storyrc
+   ```
+
+2. **Common JSON issues:**
+   - Missing comma between properties
+   - Trailing comma after last property
+   - Unquoted string values
+   - Single quotes instead of double quotes
+
+3. **Validate JSON:**
+   - Use [jsonlint.com](https://jsonlint.com) to check syntax
+   - Or use jq: `jq . ~/.storyrc`
+
+4. **Reset configuration:**
+   ```bash
+   # Backup and recreate
+   mv ~/.storyrc ~/.storyrc.backup
+   story config set network testnet
+   story config set walletAddress YOUR_ADDRESS
+   story config set pinataApiKey YOUR_KEY
+   story config set pinataApiSecret YOUR_SECRET
+   ```
+
+#### Portfolio API unavailable
+
+**Error:**
+```
+Failed to fetch IP assets from Story Protocol API
+Network error: Unable to connect to indexer service
+```
+
+**What went wrong:** The Story Protocol indexer API (Goldsky/Story API) is temporarily unavailable or unreachable.
+
+**Why it matters:** The portfolio command requires the indexer API to query your registered IP assets.
+
+**How to fix:**
+
+1. **Check internet connection:**
+   ```bash
+   curl -I https://api.storyprotocol.net
+   ```
+
+2. **Wait and retry:**
+   - API services may have temporary outages
+   - Wait 5-10 minutes and try again
+
+3. **Check Story Protocol status:**
+   - Visit [Story Protocol Discord](https://discord.gg/storyprotocol) for service announcements
+   - Check if others are experiencing similar issues
+
+4. **Use debug mode for details:**
+   ```bash
+   story portfolio --debug
+   ```
+
+5. **Verify network configuration:**
+   ```bash
+   story config get network
+   # Ensure you're on the correct network (testnet/mainnet)
+   ```
 
 ### Enable Debug Mode
 
@@ -732,7 +1005,7 @@ $ story register --debug
 [DEBUG] IP registered with ID: 987654321
 ```
 
-### Getting Additional Help
+### Getting additional help
 
 If you're still experiencing issues after trying the solutions above:
 
@@ -762,7 +1035,7 @@ If you're still experiencing issues after trying the solutions above:
 
 ## Configuration
 
-### Config File Location
+### Config file location
 
 Story CLI stores configuration in `~/.storyrc` with `600` file permissions (owner read/write only) for security.
 
@@ -771,7 +1044,7 @@ To view the config file path:
 story config path
 ```
 
-### Configuration File Format
+### Configuration file format
 
 The configuration file uses JSON format. Example:
 
@@ -785,7 +1058,7 @@ The configuration file uses JSON format. Example:
 }
 ```
 
-### Configuration Fields
+### Configuration fields
 
 | Field | Required | Description | Example |
 |-------|----------|-------------|---------|
@@ -797,7 +1070,7 @@ The configuration file uses JSON format. Example:
 
 \* Required for `story register` command
 
-### Environment Variable Overrides
+### Environment variable overrides
 
 Environment variables take precedence over config file values:
 
@@ -846,7 +1119,7 @@ story config path
 # Output: /Users/you/.storyrc
 ```
 
-### Security Best Practices
+### Security best practices
 
 ⚠️ **IMPORTANT SECURITY WARNINGS:**
 
@@ -863,123 +1136,146 @@ story config path
 
 5. **Rotate credentials regularly** - If you suspect your credentials are compromised, regenerate them immediately on Pinata and update your config
 
-## Contributing
+## Architecture decisions
 
-**Issues and PRs welcome!** Story CLI is open for community contributions. We welcome bug reports, feature suggestions, and pull requests from developers of all skill levels.
+### System architecture
 
-### How to Contribute
+```mermaid
+flowchart TB
+    subgraph CLI["Story CLI"]
+        REG[register command]
+        PORT[portfolio command]
+        CFG[config command]
+        STAT[status command]
+    end
 
-**Report Bugs or Suggest Features:**
-- Visit our GitHub Issues page: [https://github.com/Zolldyk/story-cli/issues](https://github.com/Zolldyk/story-cli/issues)
-- Search existing issues to avoid duplicates
-- Provide clear descriptions and reproduction steps for bugs
-- Tag feature requests appropriately
+    subgraph SDK["Story Protocol SDK"]
+        SPSDK[Story Protocol SDK]
+        VIEM[viem wallet]
+    end
 
-**Submit Pull Requests:**
-- Fork the repository
-- Create a feature branch from `main`
-- Make your changes following our coding standards
-- Write tests for new functionality
-- Submit a PR with a clear description of changes
+    subgraph Storage["IPFS Storage"]
+        PINATA[Pinata SDK]
+        IPFS[(IPFS Network)]
+    end
 
-### Development Setup
+    subgraph Blockchain["Story Protocol"]
+        RPC[RPC Endpoint]
+        CHAIN[(Story Blockchain)]
+        API[Story Protocol API]
+    end
 
-To contribute code to Story CLI, follow these steps:
+    REG --> PINATA
+    PINATA --> IPFS
+    REG --> SPSDK
+    SPSDK --> VIEM
+    VIEM --> RPC
+    RPC --> CHAIN
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/Zolldyk/story-cli.git
-   cd story-cli
-   ```
+    PORT --> API
+    API --> CHAIN
 
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
+    STAT --> RPC
+    CFG --> LOCAL[(~/.storyrc)]
 
-3. **Run in development mode with hot-reload:**
-   ```bash
-   npm run dev
+    classDef cli fill:#4CAF50,stroke:#2E7D32,color:#fff
+    classDef sdk fill:#2196F3,stroke:#1565C0,color:#fff
+    classDef storage fill:#FF9800,stroke:#EF6C00,color:#fff
+    classDef blockchain fill:#9C27B0,stroke:#6A1B9A,color:#fff
 
-   # Example: Test a command during development
-   npm run dev register --debug
-   ```
-
-4. **Run tests:**
-   ```bash
-   # Run all tests once
-   npm test
-
-   # Run tests in watch mode (re-runs on file changes)
-   npm run test:watch
-   ```
-
-5. **Lint your code:**
-   ```bash
-   npm run lint
-   ```
-
-6. **Format code with Prettier:**
-   ```bash
-   npm run format
-   ```
-
-7. **Build for production:**
-   ```bash
-   npm run build
-
-   # Output will be in dist/ directory
-   ```
-
-### Coding Standards
-
-All contributors must follow the project's coding standards:
-
-- **TypeScript 5.3.3** - All source code must be TypeScript
-- **ESLint** - Code must pass linting (`npm run lint`)
-- **Prettier** - Code must be formatted (`npm run format`)
-- **No `console.log`** - Use `TerminalUI` for output instead
-- **Explicit return types** - All functions must have return type annotations
-- **Error handling** - Throw typed exceptions, not generic `Error`
-- **Test coverage** - Write unit tests for new features (minimum 70% coverage for pure functions)
-
-See [docs/architecture/coding-standards.md](docs/architecture/coding-standards.md) for complete guidelines.
-
-### Project Structure
-
-```
-story-cli/
-├── src/
-│   ├── commands/        # Command implementations (register, config, status)
-│   ├── lib/             # Core libraries (clients, validation, UI)
-│   ├── types/           # TypeScript type definitions
-│   ├── constants/       # Constants (networks, licenses)
-│   └── index.ts         # CLI entry point
-├── tests/
-│   ├── unit/            # Unit tests for individual components
-│   ├── integration/     # Integration tests for command workflows
-│   └── mocks/           # Mock implementations for testing
-└── docs/                # Documentation and architecture
+    class REG,PORT,CFG,STAT cli
+    class SPSDK,VIEM sdk
+    class PINATA,IPFS storage
+    class RPC,CHAIN,API blockchain
 ```
 
-### Future Contribution Guidelines
+**Data flow:**
 
-Detailed contribution guidelines, including:
-- Code review process
-- Commit message conventions
-- Branch naming standards
-- Release process
+1. **Registration flow:** `CLI → Pinata SDK → IPFS` (metadata storage), then `CLI → Story SDK → viem → RPC → Blockchain` (IP registration)
+2. **Portfolio flow:** `CLI → Story Protocol API → Blockchain` (query registered assets)
+3. **Status flow:** `CLI → RPC Endpoint` (check wallet balance and connection)
+4. **Config flow:** `CLI → ~/.storyrc` (local file storage)
 
-...will be added post-hackathon as the project matures.
+### Graph visualization: Mermaid.js 10.6.1
 
-### Questions?
+**Decision:** Mermaid.js 10.6.1 chosen for portfolio graph visualization.
 
-If you have questions about contributing, feel free to:
-- Open a GitHub Discussion
-- Comment on relevant issues
-- Reach out via the Story Protocol community channels
+**Rationale:**
+- **Declarative syntax** reduces implementation complexity - diagrams defined as text, not imperative code
+- **Native GitHub/Markdown support** - diagrams render in documentation automatically
+- **Guaranteed MVP delivery** vs D3.js learning curve - simpler implementation with predictable timeline
+- **Simpler fallback chain** - Mermaid → Hand-rolled SVG → HTML list hierarchy
 
-Thank you for helping make Story CLI better! 🎉
+**Limitations:**
+- Less interactive than D3.js (no drag, zoom, pan)
+- Requires client-side JavaScript for rendering in HTML
+- Layout is automatic (less control than force-directed graphs)
+- Limited styling options compared to custom SVG/Canvas
+
+**Implementation:**
+- Node.js generates Mermaid flowchart syntax strings
+- HTML template includes Mermaid.js CDN script for client-side rendering
+- Fallback: SVG tree layout if Mermaid fails; HTML nested list as ultimate fallback
+
+## Frequently asked questions
+
+### Why Story CLI vs. SDK directly?
+
+Story CLI provides a **developer experience layer** on top of the Story Protocol SDK:
+
+- **Interactive wizards** guide you through complex license configurations instead of writing boilerplate code
+- **Smart defaults** for common use cases (testnet, standard licenses)
+- **Built-in IPFS integration** via Pinata - no need to set up separate IPFS upload logic
+- **Progress feedback** with spinners and success celebrations
+- **Portfolio visualization** out of the box
+
+**Use the SDK directly when:** You need custom integration logic, building a web app, or want programmatic control over every parameter.
+
+**Use Story CLI when:** You want to quickly register IP assets, prototype ideas, or avoid writing blockchain integration code.
+
+### How much does this cost?
+
+**Testnet:** Completely free. Get testnet tokens from [faucet.story.foundation](https://faucet.story.foundation).
+
+**Mainnet:**
+- **Gas fees:** ~0.0002-0.001 ETH per registration (varies with network conditions)
+- **IPFS storage:** Free via Pinata (1GB included on free tier)
+- **Story CLI:** Free and open source
+
+### Can I use this on mainnet?
+
+Yes! Switch your network configuration:
+
+```bash
+story config set network mainnet
+```
+
+**Before using mainnet:**
+1. Ensure you have real ETH in your wallet for gas fees
+2. Double-check your IP metadata - mainnet registrations are permanent
+3. Verify your Pinata storage isn't exhausted (1GB free tier)
+
+### What file types can I register?
+
+**Any file type.** Story CLI doesn't restrict file formats:
+- Images: JPG, PNG, GIF, SVG, WebP
+- Audio: MP3, WAV, FLAC, AAC
+- Video: MP4, MOV, WebM
+- Documents: PDF, TXT, DOCX
+- Code: Any source files
+- 3D: GLB, OBJ, FBX
+
+The file itself isn't uploaded to the blockchain - only its metadata (name, description, hash) is stored on IPFS and referenced in the IP registration.
+
+### How do I view my registered IP assets?
+
+Use the portfolio command:
+
+```bash
+story portfolio
+```
+
+This generates an interactive HTML dashboard at `./story-portfolio.html` showing all your registered IP assets, their relationships, and license terms.
 
 ## Resources
 

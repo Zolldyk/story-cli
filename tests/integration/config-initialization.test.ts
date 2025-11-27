@@ -1,9 +1,36 @@
 /**
  * Integration tests for configuration workflow
  * Tests first-run initialization, validation, and environment variable overrides
+ * Extended for Story 2.4, Task 3
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const execAsync = promisify(exec);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const CLI_PATH = join(__dirname, '../../dist/index.js');
+
+/**
+ * Helper to run CLI commands
+ */
+async function runCLI(args: string): Promise<{ stdout: string; stderr: string; exitCode: number }> {
+  try {
+    const { stdout, stderr } = await execAsync(`node ${CLI_PATH} ${args}`);
+    return { stdout, stderr, exitCode: 0 };
+  } catch (error: unknown) {
+    const execError = error as { stdout?: string; stderr?: string; code?: number };
+    return {
+      stdout: execError.stdout || '',
+      stderr: execError.stderr || '',
+      exitCode: execError.code || 1,
+    };
+  }
+}
 import { ConfigManager } from '../../src/lib/config-manager.js';
 import { ConfigError } from '../../src/types/errors.js';
 import { validRegisterConfig } from '../mocks/fixtures.js';
@@ -286,6 +313,71 @@ describe('Config Initialization Workflow (Integration)', () => {
       await expect(configManager.save(validRegisterConfig)).rejects.toThrow(
         /Failed to save configuration file/i
       );
+    });
+  });
+});
+
+describe('Config CLI Command Tests (Integration)', () => {
+  describe('config get command', () => {
+    it('should display current configuration with config get', async () => {
+      // Act
+      const result = await runCLI('config get');
+
+      // Assert
+      expect(result.exitCode).toBe(0);
+      // Should display configuration info (or info about no config)
+      expect(result.stdout.length).toBeGreaterThan(0);
+    });
+
+    it('should display help for config command', async () => {
+      // Act
+      const result = await runCLI('config --help');
+
+      // Assert
+      expect(result.exitCode).toBe(0);
+      expect(result.stdout).toContain('config');
+      expect(result.stdout).toContain('set');
+      expect(result.stdout).toContain('get');
+    });
+  });
+
+  describe('config set validation', () => {
+    it('should display error for invalid configuration key', async () => {
+      // Act
+      const result = await runCLI('config set invalidKey someValue');
+
+      // Assert
+      expect(result.exitCode).toBe(1);
+      expect(result.stderr).toContain('Invalid configuration key');
+    });
+
+    it('should display error for invalid network value', async () => {
+      // Act
+      const result = await runCLI('config set network invalidnetwork');
+
+      // Assert
+      expect(result.exitCode).toBe(1);
+      expect(result.stderr).toContain('Invalid network value');
+    });
+
+    it('should accept valid network value testnet', async () => {
+      // Act
+      const result = await runCLI('config set network testnet');
+
+      // Assert
+      expect(result.exitCode).toBe(0);
+      expect(result.stdout).toContain('Updated network');
+    });
+  });
+
+  describe('config path command', () => {
+    it('should display path to configuration file', async () => {
+      // Act
+      const result = await runCLI('config path');
+
+      // Assert
+      expect(result.exitCode).toBe(0);
+      expect(result.stdout).toContain('.storyrc');
     });
   });
 });

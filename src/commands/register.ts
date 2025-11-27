@@ -285,16 +285,17 @@ const MAX_UPLOAD_RETRIES = 3;
 async function displayTransactionSummary(
   license: LicenseConfig,
   metadataHash: string,
-  network: string
+  network: string,
+  showFullIds: boolean = false
 ): Promise<boolean> {
-  // Truncate metadata hash for display (AC: 6)
-  const truncatedHash =
-    metadataHash.length > 14
-      ? `${metadataHash.slice(0, 8)}...${metadataHash.slice(-6)}`
-      : metadataHash;
+  // Truncate metadata hash for display using TerminalUI (Story 2.5 AC 7)
+  const truncatedHash = TerminalUI.truncateHash(metadataHash, showFullIds);
 
-  // Build summary content
+  // Build summary content with network badge (Story 2.5 AC 9)
+  const networkBadge = TerminalUI.networkBadge(network);
   const summaryLines: string[] = [
+    `Network: ${networkBadge}`,
+    '',
     `License Type: ${license.type}`,
     `Commercial Use: ${license.commercialUse ? 'Yes' : 'No'}`,
     `Derivatives Allowed: ${license.derivativesAllowed ? 'Yes' : 'No'}`,
@@ -307,8 +308,7 @@ async function displayTransactionSummary(
 
   summaryLines.push(
     `Metadata Hash: ${truncatedHash}`,
-    `Estimated Gas Cost: ~${MIN_GAS_BALANCE} ETH`,
-    `Target Network: ${network}`
+    `Estimated Gas Cost: ~${MIN_GAS_BALANCE} ETH`
   );
 
   const summaryContent = summaryLines.join('\n');
@@ -331,25 +331,26 @@ async function displayTransactionSummary(
 
 /**
  * Display success message with Boxen
- * Source: Story 1.7 Task 6
+ * Source: Story 1.7 Task 6, Story 2.5 AC 5, 7
  *
  * @param result - RegisteredIPAsset with all transaction details
+ * @param showFullIds - If true, display full IDs without truncation
  */
-function displaySuccessMessage(result: RegisteredIPAsset): void {
+function displaySuccessMessage(result: RegisteredIPAsset, showFullIds: boolean = false): void {
   // Build success message content (AC: 5, 6, 7, 8)
   const lines: string[] = [
     '',
     'Your IP ID:',
-    result.ipId,
+    TerminalUI.truncateHash(result.ipId, showFullIds),
     '',
     'Transaction Hash:',
-    result.transactionHash,
+    TerminalUI.truncateHash(result.transactionHash, showFullIds),
     '',
     'View on Explorer:',
     result.explorerUrl,
     '',
     'IPFS Metadata:',
-    `https://gateway.pinata.cloud/ipfs/${result.metadataHash}`,
+    `https://gateway.pinata.cloud/ipfs/${TerminalUI.truncateHash(result.metadataHash, showFullIds)}`,
     '',
     "Next: Run `story portfolio` to visualize your IP assets",
     '',
@@ -357,8 +358,8 @@ function displaySuccessMessage(result: RegisteredIPAsset): void {
 
   const content = lines.join('\n');
 
-  // Display with Boxen (AC: 5)
-  TerminalUI.box('🎉 IP Registration Successful!', content);
+  // Display with majorSuccess for celebration (Story 2.5 AC 5, 6)
+  TerminalUI.majorSuccess('IP Registration Successful!', content);
 }
 
 /**
@@ -432,8 +433,8 @@ async function uploadMetadataToIPFS(
 ): Promise<string> {
   const ipfsClient = IPFSClient.getInstance();
 
-  // Create spinner (AC: 6)
-  const spinner = TerminalUI.spinner('Uploading metadata to IPFS...');
+  // Create processing spinner with gear emoji (Story 2.5 AC 6)
+  const spinner = TerminalUI.processing('Uploading metadata to IPFS...');
 
   try {
     // Upload to IPFS (AC: 6)
@@ -498,15 +499,26 @@ async function uploadMetadataToIPFS(
  * Source: architecture/components.md#Component: Register Command Handler
  *
  * @param filePath - Path to the file to register
- * @param options - Command options including optional metadataHash
+ * @param options - Command options including optional metadataHash and showFullIds
  * @returns Promise that resolves when registration is complete
  */
 async function registerCommand(
   filePath: string,
-  options: { metadataHash?: string }
+  options: { metadataHash?: string; showFullIds?: boolean }
 ): Promise<void> {
+  // Record start time for execution tracking (Story 2.5 AC 8)
+  const startTime = performance.now();
+
   // Step 1: Validate file path before prompts (AC: 2)
   validateFilePath(filePath);
+
+  // Get network for badge display (Story 2.5 AC 9)
+  const configManager = ConfigManager.getInstance();
+  const network = configManager.get('network') || 'testnet';
+  const networkBadge = TerminalUI.networkBadge(network);
+
+  // Display network badge at start of output (Story 2.5 AC 9)
+  TerminalUI.info(`${networkBadge} Starting IP registration`);
 
   // Step 2: Display file information
   displayFileInfo(filePath);
@@ -562,14 +574,12 @@ async function registerCommand(
   }
 
   // Step 8: Transaction execution (Story 1.7 scope)
-  const configManager = ConfigManager.getInstance();
-  const network = configManager.get('network') || 'testnet';
-
   // Step 8a: Display transaction summary (Task 4)
   const summaryConfirmed = await displayTransactionSummary(
     licenseConfig,
     ipfsHash,
-    network
+    network,
+    options.showFullIds
   );
 
   if (!summaryConfirmed) {
@@ -616,9 +626,10 @@ async function registerCommand(
     );
   }
 
-  // Step 8d: Execute transaction with spinner (Task 5)
-  const spinner = TerminalUI.spinner(
-    `Registering IP on Story Protocol [${network}]...`
+  // Step 8d: Execute transaction with spinner (Task 5, Story 2.5 AC 6, 9)
+  // Note: networkBadge already declared at line 518
+  const spinner = TerminalUI.processing(
+    `Registering IP on Story Protocol ${networkBadge}...`
   );
 
   try {
@@ -628,11 +639,14 @@ async function registerCommand(
     // Stop spinner on success (Critical Rule #9)
     spinner.succeed('IP registration confirmed on blockchain!');
 
-    // Step 8e: Display success message (Task 6)
-    displaySuccessMessage(result);
+    // Step 8e: Display success message (Task 6, Story 2.5 AC 7)
+    displaySuccessMessage(result, options.showFullIds);
 
     // Step 8f: Save to cache (Task 8)
     await saveToCache(result);
+
+    // Display execution time (Story 2.5 AC 8)
+    console.log(TerminalUI.executionTime(startTime));
   } catch (error) {
     // Stop spinner before displaying error (Critical Rule #9)
     spinner.fail('IP registration failed');
@@ -670,6 +684,10 @@ export function createRegisterCommand(): Command {
       '--metadata-hash <hash>',
       'Pre-uploaded IPFS metadata hash (skips metadata prompts and upload). Use this to retry failed transactions without re-uploading metadata.'
     )
+    .option(
+      '--show-full-ids',
+      'Display full transaction hashes and IP IDs without truncation'
+    )
     .addHelpText(
       'after',
       `
@@ -679,6 +697,9 @@ Examples:
 
   $ story register ./my-song.mp3 --metadata-hash QmXXX...ABC
     Register with pre-uploaded metadata (useful for retry after transaction failure)
+
+  $ story register ./my-artwork.jpg --show-full-ids
+    Register and display full transaction hashes without truncation
 
 Environment Variables:
   STORY_PRIVATE_KEY      Private key for transaction signing (required)

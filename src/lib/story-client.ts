@@ -8,11 +8,14 @@ import { http, createPublicClient, PublicClient, defineChain, parseEther } from 
 import { privateKeyToAccount, Account, Address } from 'viem/accounts';
 import { NETWORKS, NetworkName, MIN_GAS_BALANCE } from '../constants/networks.js';
 import { validatePrivateKey, validateNetwork } from './validation.js';
-import { NetworkError, TransactionError, CLIError } from '../types/errors.js';
+import { NetworkError, TransactionError, CLIError, APIError } from '../types/errors.js';
 import { TerminalUI } from './terminal-ui.js';
 import { LicenseConfig } from '../types/license.js';
 import { RegisteredIPAsset } from '../types/ip-asset.js';
+import { IPAssetWithRelationships } from '../types/portfolio.js';
+import { IPMetadata } from '../types/metadata.js';
 import { createHash } from 'crypto';
+import fetch from 'node-fetch';
 
 /**
  * Configuration for StoryClient initialization
@@ -416,6 +419,7 @@ export class StoryClient {
    * @param license - License configuration
    * @returns License terms data array for SDK
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private buildLicenseTerms(license: LicenseConfig): Array<{ terms: any }> {
     // Map license configuration to PIL Flavor
     // Non-commercial social remixing
@@ -462,5 +466,238 @@ export class StoryClient {
    */
   getSDK(): SDK {
     return this.sdk;
+  }
+
+  /**
+   * Query IP assets by wallet address from Story Protocol REST API
+   * Task 4: AC 2, 3, 9
+   * Source: https://docs.story.foundation - Protocol API Overview
+   *
+   * Uses the official Story Protocol API with public API keys.
+   * No manual configuration required - endpoints and keys are built-in.
+   *
+   * @param walletAddress - Owner wallet address to query
+   * @returns Array of IP assets with relationship data
+   * @throws NetworkError if API is unreachable
+   * @throws APIError if API returns error response
+   */
+  async queryIPAssets(
+    walletAddress: string
+  ): Promise<IPAssetWithRelationships[]> {
+    // Get Story Protocol API config for current network
+    const networkConfig = NETWORKS[this.networkName];
+    const apiUrl = networkConfig.storyApiUrl;
+    const apiKey = networkConfig.storyApiKey;
+
+    try {
+      // Create 30-second timeout promise (AC: timeout protection)
+      const timeout = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error('API timeout')), 30000);
+      });
+
+      // Fetch IP assets from Story Protocol REST API
+      // POST /assets with ownerAddress filter
+      const assetsPromise = fetch(`${apiUrl}/assets`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Api-Key': apiKey,
+        },
+        body: JSON.stringify({
+          where: {
+            ownerAddress: walletAddress.toLowerCase(),
+          },
+          includeLicenses: true,
+          pagination: {
+            limit: 200,
+            offset: 0,
+          },
+        }),
+      });
+
+      const response = await Promise.race([assetsPromise, timeout]);
+
+      // Check response status
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new APIError(
+          `Story Protocol API returned error ${response.status}: ${errorText}`
+        );
+      }
+
+      // Parse JSON response
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const result = (await response.json()) as any;
+
+      // Handle empty result set
+      if (!result.data || result.data.length === 0) {
+        return [];
+      }
+
+      // Fetch edges (parent-child relationships) for these assets
+      const ipIds = result.data.map((asset: { ipId: string }) => asset.ipId);
+      const edgesMap = await this.fetchAssetEdges(ipIds, apiUrl, apiKey);
+
+      // Transform API response to IPAssetWithRelationships[]
+      const assets: IPAssetWithRelationships[] = result.data.map(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (asset: any) => {
+          const assetName =
+            asset.title || asset.name || asset.nftMetadata?.name || 'Unnamed Asset';
+          const edges = edgesMap.get(asset.ipId) || { parentIpId: undefined, childIpIds: [] };
+
+          return {
+            ipId: asset.ipId || '',
+            name: assetName,
+            metadata: {
+              name: assetName,
+              description: asset.description || asset.nftMetadata?.description || '',
+              creator: walletAddress,
+              createdAt: asset.registrationDate || new Date().toISOString(),
+            } as IPMetadata,
+            licenseType: this.extractLicenseType(asset.licenses),
+            createdAt: asset.registrationDate || new Date().toISOString(),
+            parentIpId: edges.parentIpId,
+            childIpIds: edges.childIpIds,
+            derivativeCount: asset.childrenCount || edges.childIpIds.length,
+            royaltiesEarned: 0, // Royalty data requires separate API call
+            licensesIssued: asset.licenses?.length || 0,
+          };
+        }
+      );
+
+      return assets;
+    } catch (error) {
+      // Handle timeout errors
+      if (error instanceof Error && error.message === 'API timeout') {
+        throw NetworkError.rpcTimeout(apiUrl);
+      }
+
+      // Handle API errors
+      if (error instanceof APIError) {
+        throw error;
+      }
+
+      // Handle network errors
+      if (
+        error instanceof Error &&
+        (error.message.includes('ECONNREFUSED') ||
+          error.message.includes('ENOTFOUND'))
+      ) {
+        throw NetworkError.connectionFailed(apiUrl);
+      }
+
+      // Wrap unexpected errors
+      throw new APIError(`Failed to query IP assets: ${(error as Error).message}`);
+    }
+  }
+
+  /**
+   * Fetch parent-child edges for a list of IP asset IDs
+   * Uses the /assets/edges endpoint to get derivative relationships
+   *
+   * @param ipIds - Array of IP asset IDs to fetch edges for
+   * @param apiUrl - Story Protocol API URL
+   * @param apiKey - Story Protocol API key
+   * @returns Map of ipId to { parentIpId, childIpIds }
+   */
+  private async fetchAssetEdges(
+    ipIds: string[],
+    apiUrl: string,
+    apiKey: string
+  ): Promise<Map<string, { parentIpId?: string; childIpIds: string[] }>> {
+    const edgesMap = new Map<string, { parentIpId?: string; childIpIds: string[] }>();
+
+    // Initialize map with empty values for all IPs
+    for (const ipId of ipIds) {
+      edgesMap.set(ipId, { parentIpId: undefined, childIpIds: [] });
+    }
+
+    try {
+      // Fetch edges where these IPs are children (to get parentIpId)
+      // and where these IPs are parents (to get childIpIds)
+      // We'll do this by querying all edges and filtering
+      const response = await fetch(`${apiUrl}/assets/edges`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Api-Key': apiKey,
+        },
+        body: JSON.stringify({
+          pagination: {
+            limit: 200,
+            offset: 0,
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        TerminalUI.debug(`Failed to fetch edges: ${response.status}`);
+        return edgesMap;
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const result = (await response.json()) as any;
+
+      if (!result.data) {
+        return edgesMap;
+      }
+
+      // Process edges to build parent-child relationships
+      for (const edge of result.data) {
+        const parentIpId = edge.parentIpId;
+        const childIpId = edge.childIpId;
+
+        // If child is in our IP list, set its parent
+        if (ipIds.includes(childIpId)) {
+          const existing = edgesMap.get(childIpId)!;
+          existing.parentIpId = parentIpId;
+        }
+
+        // If parent is in our IP list, add child to its childIpIds
+        if (ipIds.includes(parentIpId)) {
+          const existing = edgesMap.get(parentIpId)!;
+          if (!existing.childIpIds.includes(childIpId)) {
+            existing.childIpIds.push(childIpId);
+          }
+        }
+      }
+
+      return edgesMap;
+    } catch (error) {
+      TerminalUI.debug(`Error fetching edges: ${(error as Error).message}`);
+      return edgesMap;
+    }
+  }
+
+  /**
+   * Extract license type from licenses array
+   *
+   * @param licenses - Array of license objects from API
+   * @returns License type string
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private extractLicenseType(licenses: any[] | undefined): string {
+    if (!licenses || licenses.length === 0) {
+      return 'unknown';
+    }
+
+    const license = licenses[0];
+    const terms = license.terms;
+
+    if (!terms) {
+      return license.templateName || 'unknown';
+    }
+
+    // Determine license type based on terms
+    if (terms.commercialUse && terms.derivativesAllowed) {
+      return 'commercial-remix';
+    } else if (terms.commercialUse) {
+      return 'commercial-use';
+    } else if (terms.derivativesAllowed) {
+      return 'non-commercial-social-remixing';
+    } else {
+      return 'non-commercial';
+    }
   }
 }
